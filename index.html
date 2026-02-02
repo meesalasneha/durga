@@ -1,0 +1,82 @@
+import re
+from collections import defaultdict
+
+# Predefined job roles and their associated keywords
+JOB_KEYWORDS = {
+    "Software Engineer": [
+        "python", "java", "c++", "javascript", "programming", "algorithms", "data structures",
+        "software development", "debugging", "version control", "git", "agile", "scrum",
+        "api", "database", "sql", "nosql", "cloud", "aws", "azure", "docker", "kubernetes"
+    ],
+    "Data Scientist": [
+        "python", "r", "machine learning", "data analysis", "statistics", "pandas", "numpy",
+        "scikit-learn", "tensorflow", "keras", "deep learning", "neural networks", "big data",
+        "hadoop", "spark", "sql", "data visualization", "matplotlib", "seaborn", "tableau"
+    ],
+    "Product Manager": [
+        "product strategy", "roadmap", "user experience", "ux/ui", "agile", "scrum", "kanban",
+        "stakeholder management", "market research", "analytics", "kpi", "metrics", "a/b testing",
+        "prototyping", "wireframing", "jira", "confluence", "customer feedback"
+    ],
+    "Marketing Specialist": [
+        "digital marketing", "seo", "sem", "social media", "content creation", "google analytics",
+        "email marketing", "campaign management", "brand awareness", "lead generation", "crm",
+        "hubspot", "adobe creative suite", "copywriting", "market research", "ppc", "influencer marketing"
+    ]
+}
+
+def preprocess_text(text):
+    """Preprocess text by lowercasing and removing non-alphanumeric characters."""
+    text = text.lower()
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+    return text
+
+def calculate_relevance_score(resume_text, job_keywords):
+    """Calculate relevance score based on keyword matches."""
+    resume_text = preprocess_text(resume_text)
+    matched_keywords = []
+    missing_keywords = []
+    
+    for keyword in job_keywords:
+        if keyword.lower() in resume_text:
+            matched_keywords.append(keyword)
+        else:
+            missing_keywords.append(keyword)
+    
+    score = (len(matched_keywords) / len(job_keywords)) * 100 if job_keywords else 0
+    return score, matched_keywords, missing_keywords
+
+def main():
+    print("Resume Relevance Evaluator")
+    print("Available job roles:")
+    for i, role in enumerate(JOB_KEYWORDS.keys(), 1):
+        print(f"{i}. {role}")
+    
+    # Select job role
+    while True:
+        try:
+            choice = int(input("Select a job role by number: "))
+            if 1 <= choice <= len(JOB_KEYWORDS):
+                selected_role = list(JOB_KEYWORDS.keys())[choice - 1]
+                break
+            else:
+                print("Invalid choice. Please select a valid number.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+    
+    # Input resume text
+    resume_text = input("Paste your resume text here: ")
+    
+    # Get keywords for selected role
+    job_keywords = JOB_KEYWORDS[selected_role]
+    
+    # Calculate score and keywords
+    score, matched, missing = calculate_relevance_score(resume_text, job_keywords)
+    
+    # Output results
+    print(f"\nRelevance Score for {selected_role}: {score:.2f}%")
+    print(f"Matched Keywords ({len(matched)}/{len(job_keywords)}): {', '.join(matched)}")
+    print(f"Missing Keywords: {', '.join(missing)}")
+
+if __name__ == "__main__":
+    main()
